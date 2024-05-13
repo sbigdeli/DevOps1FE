@@ -1,11 +1,9 @@
-name: Pull Request on Main
+name: Push Request on Main
 
 on:
-  pull_request:
+  push:
     branches:
       - main
-    types:
-      - opened
 
 jobs:
   build:
