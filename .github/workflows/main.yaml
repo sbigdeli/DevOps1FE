@@ -18,6 +18,6 @@ jobs:
         uses: slackapi/slack-github-action@v1.26.0
         with:
           channel-id: 'C072YF4QUAJ'
-          slack-message: "New push to main by https://github.com/Vedmastaren/DevOps1FE|${{ github.event.pusher.name }}: ${{ github.event.compare }}"
+          slack-message: "New push to main by ${{ github.event.pusher.name }}: ${{ github.event.compare }}"
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_TOKEN }}
