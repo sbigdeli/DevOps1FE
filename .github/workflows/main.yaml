@@ -24,7 +24,7 @@ jobs:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_TOKEN }}
 
       - name: Post to a Slack channel
-        
+        if: failure()
         id: slack_failure
         uses: slackapi/slack-github-action@v1.26.0
         with:
