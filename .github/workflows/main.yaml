@@ -18,7 +18,7 @@ jobs:
         id: slack_success
         uses: slackapi/slack-github-action@v1.26.0
         with:
-          channel-id: 'C072YF4QUAJ'
+          channel-id: 'C072YF4Qw'
           slack-message: "New push to main by ${{ github.event.pusher.name }}: ${{ github.event.compare }}"
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_TOKEN }}
