@@ -32,4 +32,29 @@ jobs:
           slack-message: "New push to main but it failed ${{ github.event.pusher.name }}: ${{ github.event.compare }}"
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_TOKEN }}
+
+      - name: Run npm audit 
+        id: npm_audit
+        run: |
+
+      - name: Post Audit Results to Slack
+        if: failure()  # Kör detta steg endast om npm audit hittar sårbarheter
+        uses: slackapi/slack-github-action@v1.26.0
+        with:
+          channel-id: 'C072YF4QUAJ'
+          slack-message: |
+            :warning: npm audit found vulnerabilities!
+            $(cat audit-report.json | jq '.advisories | map(.title) | join(", ")')
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_TOKEN }}
+
+      - name: Post Success Message to Slack
+        if: success()  # Kör detta steg om inga sårbarheter hittas
+        uses: slackapi/slack-github-action@v1.26.0
+        with:
+          channel-id: 'C072YF4QUAJ'
+          slack-message: "New push to main by ${{ github.event.pusher.name }}: ${{ github.event.compare }}. No vulnerabilities found."
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_TOKEN }}
+
           
