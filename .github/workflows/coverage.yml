@@ -26,23 +26,22 @@ jobs:
     - name: Run the tests
       run: npm test
 
-    - name: Post to a Slack channel
+    - name: Post success to Slack
       if: success()
       id: slack_success
       uses: slackapi/slack-github-action@v1.26.0
       with:
-          channel-id: 'C072YF4QUAJ'
-          slack-message: "Coverage test success ${{ github.event.pusher.name }}: ${{ github.event.compare }}"
+        channel-id: 'C072YF4QUAJ'
+        slack-message: "Coverage test success for PR #${{ github.event.number }} by ${{ github.event.pull_request.user.login }}: ${{ github.event.pull_request.html_url }}"
       env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_TOKEN }}
+        SLACK_BOT_TOKEN: ${{ secrets.SLACK_TOKEN }}
 
-    - name: Post to a Slack channel
+    - name: Post failure to Slack
       if: failure()
       id: slack_failure
       uses: slackapi/slack-github-action@v1.26.0
       with:
-          channel-id: 'C072YF4QUAJ'
-          slack-message: "Coverage test failed ${{ github.event.pusher.name }}: ${{ github.event.compare }}"
+        channel-id: 'C072YF4QUAJ'
+        slack-message: "Coverage test failed for PR #${{ github.event.number }} by ${{ github.event.pull_request.user.login }}: ${{ github.event.pull_request.html_url }}"
       env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_TOKEN }}
-          
+        SLACK_BOT_TOKEN: ${{ secrets.SLACK_TOKEN }}
