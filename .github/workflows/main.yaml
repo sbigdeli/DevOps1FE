@@ -35,7 +35,7 @@ jobs:
 
       - name: Run npm audit 
         id: npm_audit
-        run: |
+        run: npm audit
 
       - name: Post Audit Results to Slack
         if: failure()  # Kör detta steg endast om npm audit hittar sårbarheter
