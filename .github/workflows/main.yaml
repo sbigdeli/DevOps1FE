@@ -50,8 +50,7 @@ jobs:
         with:
           channel-id: 'C072YF4QUAJ'
           slack-message: |
-            :warning: npm audit found vulnerabilities!
-            $(cat audit-report.json | jq '.advisories | map(.title) | join(", ")')
+            :warning: npm audit found high vulnerabilities!
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_TOKEN }}
 
