@@ -24,6 +24,32 @@ jobs:
       - name: Run test script
         run: npm test
 
+      # Step to bump version and update version.md (replace with your actual version file name)
+      - name: Bump Version and Update version.md
+        if: github.ref == 'refs/heads/main'  # Only run on main branch push
+        run: |
+          ./bumpversion.sh ${{ github.event_name }}  # Pass in the event name (push, pull_request) to determine bump type
+          git add version.md  # Replace with your actual version file
+          git commit -m "Bumped version"
+          git push origin main
+
+      - name: Build Docker Image
+        env:
+          IMAGE_TAG: $(cat version.md)
+        run: |
+          docker build -t myapp:$IMAGE_TAG .
+          docker tag myapp:$IMAGE_TAG myapp:latest  # Optionally tag as latest
+          docker push myapp:$IMAGE_TAG
+          docker push myapp:latest
+
+      # Tag repository commit after successful deployment
+      - name: Tag Repository Commit
+        if: success() && github.ref == 'refs/heads/main'
+        run: |
+          git tag $(cat version.md)
+          git push origin $(cat version.md)
+
+          
       - name: Post to a Slack channel
         if: success()
         id: slack_success
