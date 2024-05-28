@@ -6,6 +6,8 @@ if [ $# -ne 1 ]; then
     exit 1
 fi
 
+bump_type=$1 
+
 version_file="version.md"
 
 current_version=$(grep -oP '(?<=Version:\s)\d+\.\d+\.\d+' "$version_file")
@@ -16,7 +18,7 @@ minor=$(echo "$current_version" | cut -d '.' -f 2)
 patch=$(echo "$current_version" | cut -d '.' -f 3)
 
 # Bump version based on bump type
-case "$1" in
+case "$bump_type" in
     major)
         major=$((major + 1))
         minor=0
