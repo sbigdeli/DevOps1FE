@@ -1,8 +1,11 @@
 #!/bin/bash
 
-# Requirements 4: version.md will update
-# Check if argument is provided
-if [ $# -ne 1 ]; then
+# Set Git user identity
+git config --global user.email "you@example.com"
+git config --global user.name "Your Name"
+
+# Check if arguments are provided
+if [ $# -lt 1 ]; then
     echo "Usage: $0 <bump_type>"
     echo "Available bump types: major, minor, patch"
     exit 1
@@ -41,4 +44,12 @@ esac
 new_version="$major.$minor.$patch"
 sed -i "s/Version: $current_version/Version: $new_version/" "$version_file"
 
+echo "Bumped $1 version to $new_version in $version_file"
+
+# Commit changes
+git add "$version_file"
+git commit -m "Bumped version"
+echo "Committed changes with message: Bumped version"
+
+# Print updated version
 echo "Bumped $1 version to $new_version in $version_file"
