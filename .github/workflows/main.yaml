@@ -29,14 +29,14 @@ jobs:
         run: echo "::set-output name=bump_type::$(git log --format=%B -n 1 ${{ github.sha }} | grep -oE 'major|minor|patch')"
 
       - name: Run version bump script
-        run: bash path/to/your/script.sh ${{ steps.extract_bump_type.outputs.bump_type }}
+        run: bash bumpversion.sh ${{ steps.extract_bump_type.outputs.bump_type }}
 
       - name: Tag commit with new version
         run: git tag -a v$(grep -oP '(?<=Version:\s)\d+\.\d+\.\d+' "version.md") -m "Version $(grep -oP '(?<=Version:\s)\d+\.\d+\.\d+' "version.md")"
 
       - name: Push tag to GitHub
         run: git push origin --tags
-        
+
       - name: Post to Slack on Success
         if: success()
         uses: slackapi/slack-github-action@v1.26.0
