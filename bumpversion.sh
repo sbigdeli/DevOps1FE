@@ -1,4 +1,4 @@
-# Requirements 4: version.md will update
+# Requirements 4: version.md will updatee
 # Check if argument is provided
 if [ $# -ne 1 ]; then
     echo "Usage: $0 <bump_type>"
