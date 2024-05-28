@@ -1,5 +1,9 @@
 # Requirements 4: version.md will updates
 # Check if argument is provided or extracted from commit message
+
+git config --global user.email "you@example.com"
+git config --global user.name "Your Name"
+
 if [ -z "$1" ]; then
     echo "Error: Bump type not provided or extracted from commit message."
     exit 1
