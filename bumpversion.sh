@@ -1,4 +1,4 @@
-# Requirements 4: version.md will update
+# Requirements 4: version.md will updates
 # Check if argument is provided or extracted from commit message
 if [ -z "$1" ]; then
     echo "Error: Bump type not provided or extracted from commit message."
