@@ -24,7 +24,7 @@ jobs:
       - name: Run test script
         run: npm test
 
-      # Prompt for input to select bump type
+      # Prompt for input to select bump typee 
       - name: Select Bump Type
         if: github.ref == 'refs/heads/main'
         run: |
