@@ -24,48 +24,19 @@ jobs:
       - name: Run test script
         run: npm test
 
-      - name: Select Bump Type
-        id: select_bump
-        if: github.ref == 'refs/heads/main'
-        run: |
-          COMMIT_MSG=$(git log --format=%B -n 1 HEAD)
-          if [[ $COMMIT_MSG == "major"* ]]; then
-            BUMP_TYPE="major"
-          elif [[ $COMMIT_MSG == "minor"* ]]; then
-            BUMP_TYPE="minor"
-          elif [[ $COMMIT_MSG == "patch"* ]]; then
-            BUMP_TYPE="patch"
-          else
-            echo "No valid bump type found in commit message, defaulting to patch."
-            BUMP_TYPE="patch"
-          fi
-          echo "Selected BUMP_TYPE: $BUMP_TYPE"
-          echo "::set-output name=bump_type::$BUMP_TYPE"
+      - name: Extract bump type from commit message
+        id: extract_bump_type
+        run: echo "::set-output name=bump_type::$(git log --format=%B -n 1 ${{ github.sha }} | grep -oE 'major|minor|patch')"
 
-      - name: Bump Version and Update version.md
-        if: github.ref == 'refs/heads/main'
-        run: |
-          chmod +x bumpversion.sh
-          ./bumpversion.sh ${{ steps.select_bump.outputs.bump_type }}
-          git add version.md
-          git commit -m "Bumped version"
-          git push origin main
+      - name: Run version bump script
+        run: bash path/to/your/script.sh ${{ steps.extract_bump_type.outputs.bump_type }}
 
-      - name: Build Docker Image
-        env:
-          IMAGE_TAG: $(cat version.md)
-        run: |
-          docker build -t myapp:$IMAGE_TAG .
-          docker tag myapp:$IMAGE_TAG myapp:latest
-          docker push myapp:$IMAGE_TAG
-          docker push myapp:latest
+      - name: Tag commit with new version
+        run: git tag -a v$(grep -oP '(?<=Version:\s)\d+\.\d+\.\d+' "version.md") -m "Version $(grep -oP '(?<=Version:\s)\d+\.\d+\.\d+' "version.md")"
 
-      - name: Tag Repository Commit
-        if: success() && github.ref == 'refs/heads/main'
-        run: |
-          git tag $(cat version.md)
-          git push origin $(cat version.md)
-
+      - name: Push tag to GitHub
+        run: git push origin --tags
+        
       - name: Post to Slack on Success
         if: success()
         uses: slackapi/slack-github-action@v1.26.0

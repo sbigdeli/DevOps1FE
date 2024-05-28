@@ -1,16 +1,11 @@
-#!/bin/bash
-
-# Set Git user identity
-git config --global user.email "you@example.com"
-git config --global user.name "Your Name"
-
-# Check if arguments are provided
-if [ $# -lt 1 ]; then
-    echo "Usage: $0 <bump_type>"
-    echo "Available bump types: major, minor, patch"
+# Requirements 4: version.md will update
+# Check if argument is provided or extracted from commit message
+if [ -z "$1" ]; then
+    echo "Error: Bump type not provided or extracted from commit message."
     exit 1
 fi
 
+bump_type="$1"
 version_file="version.md"
 
 current_version=$(grep -oP '(?<=Version:\s)\d+\.\d+\.\d+' "$version_file")
@@ -21,7 +16,7 @@ minor=$(echo "$current_version" | cut -d '.' -f 2)
 patch=$(echo "$current_version" | cut -d '.' -f 3)
 
 # Bump version based on bump type
-case "$1" in
+case "$bump_type" in
     major)
         major=$((major + 1))
         minor=0
@@ -44,12 +39,4 @@ esac
 new_version="$major.$minor.$patch"
 sed -i "s/Version: $current_version/Version: $new_version/" "$version_file"
 
-echo "Bumped $1 version to $new_version in $version_file"
-
-# Commit changes
-git add "$version_file"
-git commit -m "Bumped version"
-echo "Committed changes with message: Bumped version"
-
-# Print updated version
-echo "Bumped $1 version to $new_version in $version_file"
+echo "Bumped $bump_type version to $new_version in $version_file"
