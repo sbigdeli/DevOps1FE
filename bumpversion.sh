@@ -1,12 +1,12 @@
-# Requirements 4: version.md will updatee
+#!/bin/bash
+
+# Requirements 4: version.md will update
 # Check if argument is provided
 if [ $# -ne 1 ]; then
     echo "Usage: $0 <bump_type>"
     echo "Available bump types: major, minor, patch"
     exit 1
 fi
-
-bump_type=$1 
 
 version_file="version.md"
 
@@ -18,7 +18,7 @@ minor=$(echo "$current_version" | cut -d '.' -f 2)
 patch=$(echo "$current_version" | cut -d '.' -f 3)
 
 # Bump version based on bump type
-case "$bump_type" in
+case "$1" in
     major)
         major=$((major + 1))
         minor=0

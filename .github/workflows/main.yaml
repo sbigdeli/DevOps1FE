@@ -16,19 +16,29 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '20' 
+          node-version: '20'
 
       - name: Install Dependencies
         run: npm install
-        
+
       - name: Run test script
         run: npm test
 
       - name: Select Bump Type
+        id: select_bump
         if: github.ref == 'refs/heads/main'
         run: |
           COMMIT_MSG=$(git log --format=%B -n 1 HEAD)
-          BUMP_TYPE=$(echo "$COMMIT_MSG" | cut -c 1-5)
+          if [[ $COMMIT_MSG == "major"* ]]; then
+            BUMP_TYPE="major"
+          elif [[ $COMMIT_MSG == "minor"* ]]; then
+            BUMP_TYPE="minor"
+          elif [[ $COMMIT_MSG == "patch"* ]]; then
+            BUMP_TYPE="patch"
+          else
+            echo "No valid bump type found in commit message, defaulting to patch."
+            BUMP_TYPE="patch"
+          fi
           echo "Selected BUMP_TYPE: $BUMP_TYPE"
           echo "::set-output name=bump_type::$BUMP_TYPE"
 
@@ -50,35 +60,31 @@ jobs:
           docker push myapp:$IMAGE_TAG
           docker push myapp:latest
 
-      # Tag repository commit after successful deployment
       - name: Tag Repository Commit
         if: success() && github.ref == 'refs/heads/main'
         run: |
           git tag $(cat version.md)
           git push origin $(cat version.md)
 
-
-      - name: Post to a Slack channel
+      - name: Post to Slack on Success
         if: success()
-        id: slack_success
         uses: slackapi/slack-github-action@v1.26.0
         with:
           channel-id: 'C072YF4QUAJ'
-          slack-message: "New push to main by ${{ github.event.pusher.name }}: ${{ github.event.compare }}"
+          slack-message: "New push to main by ${{ github.event.pusher.name }}: ${{ github.event.compare }}. No vulnerabilities found."
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_TOKEN }}
 
-      - name: Post to a Slack channel
+      - name: Post to Slack on Failure
         if: failure()
-        id: slack_failure
         uses: slackapi/slack-github-action@v1.26.0
         with:
           channel-id: 'C072YF4QUAJ'
           slack-message: "New push to main but it failed ${{ github.event.pusher.name }}: ${{ github.event.compare }}"
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_TOKEN }}
-      # Requirement 2: Glöm inte att ta bort override i package.json rad 29,30 57,58
-      - name: Run npm audit 
+
+      - name: Run npm audit
         id: npm_audit
         run: |
           if npm audit --json | grep -q '"severity": "high"'; then
@@ -88,7 +94,6 @@ jobs:
             echo "No high severity vulnerabilities found"
           fi
 
-
       - name: Post Audit Results to Slack
         if: failure()  # Kör detta steg endast om npm audit hittar sårbarheter
         uses: slackapi/slack-github-action@v1.26.0
@@ -96,14 +101,5 @@ jobs:
           channel-id: 'C072YF4QUAJ'
           slack-message: |
             :warning: npm audit found high vulnerabilities!
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_TOKEN }}
-
-      - name: Post Success Message to Slack
-        if: success()  # Kör detta steg om inga sårbarheter hittas
-        uses: slackapi/slack-github-action@v1.26.0
-        with:
-          channel-id: 'C072YF4QUAJ'
-          slack-message: "New push to main by ${{ github.event.pusher.name }}: ${{ github.event.compare }}. No vulnerabilities found."
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_TOKEN }}
