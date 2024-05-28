@@ -13,6 +13,9 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
+      - name: Run test script
+        run: npm test
+
       - name: Post to a Slack channel
         if: success()
         id: slack_success
@@ -32,7 +35,7 @@ jobs:
           slack-message: "New push to main but it failed ${{ github.event.pusher.name }}: ${{ github.event.compare }}"
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_TOKEN }}
-
+      # Requirement 2: Glöm inte att ta bort override i package.json rad 29,30 57,58
       - name: Run npm audit 
         id: npm_audit
         run: |
