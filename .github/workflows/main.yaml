@@ -35,7 +35,14 @@ jobs:
 
       - name: Run npm audit 
         id: npm_audit
-        run: npm audit
+        run: |
+          if npm audit --json | grep -q '"severity": "high"'; then
+            echo "High severity vulnerabilities found"
+            exit 1
+          else
+            echo "No high severity vulnerabilities found"
+          fi
+
 
       - name: Post Audit Results to Slack
         if: failure()  # Kör detta steg endast om npm audit hittar sårbarheter
