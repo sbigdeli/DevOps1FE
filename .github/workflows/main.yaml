@@ -13,48 +13,64 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Post to a Slack channel
-        if: success()
-        id: slack_success
-        uses: slackapi/slack-github-action@v1.26.0
+      - name: Install Node.js
+        uses: actions/setup-node@v2
         with:
-          channel-id: 'C072YF4QUAJ'
-          slack-message: "New push to main by ${{ github.event.pusher.name }}: ${{ github.event.compare }}"
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_TOKEN }}
+          node-version: '20'  # Du kan ange den Node.js-version du vill använda
 
-      - name: Post to a Slack channel
-        if: failure()
-        id: slack_failure
-        uses: slackapi/slack-github-action@v1.26.0
-        with:
-          channel-id: 'C072YF4QUAJ'
-          slack-message: "New push to main but it failed ${{ github.event.pusher.name }}: ${{ github.event.compare }}"
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_TOKEN }}
+      - name: Install Dependencies
+        run: npm install
 
-      - name: Run npm audit 
+      - name: Run npm audit
         id: npm_audit
+        continue-on-error: true  # Fortsätt körning även om npm audit misslyckas
         run: |
+          npm audit --json > audit-report.json
+          cat audit-report.json
 
-      - name: Post Audit Results to Slack
-        if: failure()  # Kör detta steg endast om npm audit hittar sårbarheter
+      - name: Check for High Vulnerabilities
+        id: check_high_vulnerabilities
+        run: |
+          high_vulns=$(jq '[.advisories[] | select(.severity == "high")] | length' < audit-report.json)
+          if [ "$high_vulns" -gt 0 ]; then
+            echo "High vulnerabilities found: $high_vulns"
+            exit 1
+          fi
+
+      - name: Post Audit Results to Slack on Failure
+        if: failure()
         uses: slackapi/slack-github-action@v1.26.0
         with:
           channel-id: 'C072YF4QUAJ'
           slack-message: |
-            :warning: npm audit found vulnerabilities!
+            ⚠️ npm audit found vulnerabilities!
             $(cat audit-report.json | jq '.advisories | map(.title) | join(", ")')
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_TOKEN }}
 
       - name: Post Success Message to Slack
-        if: success()  # Kör detta steg om inga sårbarheter hittas
+        if: success()
         uses: slackapi/slack-github-action@v1.26.0
         with:
           channel-id: 'C072YF4QUAJ'
-          slack-message: "New push to main by ${{ github.event.pusher.name }}: ${{ github.event.compare }}. No vulnerabilities found."
+          slack-message: "New push to main by ${{ github.event.pusher.name }}: ${{ github.event.compare }}. No high vulnerabilities found."
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_TOKEN }}
 
-          
+      - name: Post to a Slack channel on Success
+        if: success()
+        uses: slackapi/slack-github-action@v1.26.0
+        with:
+          channel-id: 'C072YF4QUAJ'
+          slack-message: "New push to main by ${{ github.event.pusher.name }}: ${{ github.event.compare }}. Pipeline succeeded."
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_TOKEN }}
+
+      - name: Post to a Slack channel on Failure
+        if: failure()
+        uses: slackapi/slack-github-action@v1.26.0
+        with:
+          channel-id: 'C072YF4QUAJ'
+          slack-message: "New push to main but it failed by ${{ github.event.pusher.name }}: ${{ github.event.compare }}."
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_TOKEN }}
