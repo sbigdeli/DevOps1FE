@@ -25,10 +25,6 @@
     "web-vitals": "^2.1.4",
     "nth-check": "^2.1.1"
   },
-
-  "overrides": {
-    "@svgr/webpack": "$@svgr/webpack"
-  },
   
   "scripts": {
     "start": "react-scripts start",
@@ -53,8 +49,6 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "overrides": {
-    "nth-check": "$nth-check"
-}
+  }
+  
 }
