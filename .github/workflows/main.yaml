@@ -3,7 +3,7 @@ name: Push Request on Main
 on:
   push:
     branches:
-      - pull
+      - push
 
 jobs:
   build:
