@@ -24,12 +24,20 @@ jobs:
       - name: Run test script
         run: npm test
 
-      # Step to bump version and update version.md (replace with your actual version file name)
-      - name: Bump Version and Update version.md
-        if: github.ref == 'refs/heads/main'  # Only run on main branch push
+      # Prompt for input to select bump type
+      - name: Select Bump Type
+        if: github.ref == 'refs/heads/main'
         run: |
-          ./bumpversion.sh ${{ github.event_name }}  # Pass in the event name (push, pull_request) to determine bump type
-          git add version.md  # Replace with your actual version file
+          echo "Which bump type would you like to perform? (major|minor|patch)"
+          read BUMP_TYPE
+          echo "::set-output name=bump_type::$BUMP_TYPE"
+
+      # Step to bump version and update version.md
+      - name: Bump Version and Update version.md
+        if: github.ref == 'refs/heads/main'
+        run: |
+          ./bumpversion.sh ${{ steps.select_bump.outputs.bump_type }}
+          git add version.md
           git commit -m "Bumped version"
           git push origin main
 
@@ -38,7 +46,7 @@ jobs:
           IMAGE_TAG: $(cat version.md)
         run: |
           docker build -t myapp:$IMAGE_TAG .
-          docker tag myapp:$IMAGE_TAG myapp:latest  # Optionally tag as latest
+          docker tag myapp:$IMAGE_TAG myapp:latest
           docker push myapp:$IMAGE_TAG
           docker push myapp:latest
 
@@ -49,7 +57,7 @@ jobs:
           git tag $(cat version.md)
           git push origin $(cat version.md)
 
-          
+
       - name: Post to a Slack channel
         if: success()
         id: slack_success
