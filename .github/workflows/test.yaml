@@ -34,7 +34,7 @@ jobs:
         run: |
           bash test.sh
           docker build -t vedmastaren/test:${{ github.run_number }} .
-          docker tag vedmastaren/test:${{ github.run_number }} vedmastaren/test :v${{ github.run_number }}
+          docker tag vedmastaren/test:${{ github.run_number }} vedmastaren/test:v${{ github.run_number }}
           docker push vedmastaren/test:${{ github.run_number }}
           docker push vedmastaren/test:v${{ github.run_number }}
 
