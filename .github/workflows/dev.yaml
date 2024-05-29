@@ -21,21 +21,34 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Run test script
+      - name: Run npm audit
+        run: npm audit --audit-level=high
+
+      - name: Run Automated Tests
         run: npm test
 
-      - name: Extract bump type from commit message
-        id: extract_bump_type
-        run: echo "::set-output name=bump_type::$(git log --format=%B -n 1 ${{ github.sha }} | grep -oE 'major|minor|patch')"
+      - name: Store Application Version
+        run: echo "${{ github.run_number }}" > version.md
 
-      - name: Run version bump script
-        run: bash bumpversion.sh ${{ steps.extract_bump_type.outputs.bump_type }}
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+  
+      - name: Ensure script is executable
+        run: chmod +x dev.sh
 
-      - name: Tag commit with new version
-        run: git tag -a v$(grep -oP '(?<=Version:\s)\d+\.\d+\.\d+' "version.md") -m "Version $(grep -oP '(?<=Version:\s)\d+\.\d+\.\d+' "version.md")"
+      - name: Bump Version and Tag Docker Image
+        run: |
+          bash dev.sh
+          docker build -t vedmastaren/test:${{ github.run_number }} .
+          docker tag vedmastaren/test:${{ github.run_number }} vedmastaren/test:v${{ github.run_number }}
+          docker push vedmastaren/test:${{ github.run_number }}
+          docker push vedmastaren/test:v${{ github.run_number }}
 
-      - name: Push tag to GitHub
-        run: git push origin --tags
+      - name: Tag Repository Commit
+        run: git tag v${{ github.run_number }}
 
       - name: Post to Slack on Success
         if: success()
