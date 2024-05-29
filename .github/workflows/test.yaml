@@ -32,7 +32,7 @@ jobs:
 
       - name: Bump Version and Tag Docker Image
         run: |
-          ./test.sh
+          bash test.sh
           docker build -t myapp:${{ github.run_number }} .
           docker tag myapp:${{ github.run_number }} myapp:v${{ github.run_number }}
           docker push myapp:${{ github.run_number }}
