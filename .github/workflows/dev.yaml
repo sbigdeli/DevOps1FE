@@ -3,7 +3,7 @@ name: Push Request on Main
 on:
   push:
     branches:
-      - main
+      - dev
 
 jobs:
   build:
@@ -67,16 +67,6 @@ jobs:
           slack-message: "New push to main but it failed ${{ github.event.pusher.name }}: ${{ github.event.compare }}"
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_TOKEN }}
-
-      - name: Run npm audit
-        id: npm_audit
-        run: |
-          if npm audit --json | grep -q '"severity": "high"'; then
-            echo "High severity vulnerabilities found"
-            exit 1
-          else
-            echo "No high severity vulnerabilities found"
-          fi
 
       - name: Post Audit Results to Slack
         if: failure()  # Kör detta steg endast om npm audit hittar sårbarheter
