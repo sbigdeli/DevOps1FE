@@ -10,11 +10,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Set up job
-      run: echo "Setting up job"
-
+      
     - name: Checkout repository
       uses: actions/checkout@v2
+      with:
+        token: ${{ secrets.GH_PAT }}
 
     - name: Build Docker image
       run: docker build -t vedmastaren/test .
@@ -40,10 +40,7 @@ jobs:
         docker push vedmastaren/test:v${{ env.VERSION }}
 
     - name: Add tag to commit
-      uses: actions/checkout@v2
-      with:
-        token: ${{ secrets.GH_PAT }}
-    - run: |
+      run: |
         git config --global user.name 'github-actions'
         git config --global user.email 'github-actions@github.com'
         git tag -a v${{ env.VERSION }} -m "Release v${{ env.VERSION }}"
