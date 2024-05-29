@@ -37,11 +37,11 @@ jobs:
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
   
       - name: Ensure script is executable
-        run: chmod +x test.sh
+        run: chmod +x dev.sh
 
       - name: Bump Version and Tag Docker Image
         run: |
-          bash test.sh
+          bash dev.sh
           docker build -t vedmastaren/test:${{ github.run_number }} .
           docker tag vedmastaren/test:${{ github.run_number }} vedmastaren/test:v${{ github.run_number }}
           docker push vedmastaren/test:${{ github.run_number }}
