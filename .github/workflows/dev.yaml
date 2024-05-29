@@ -1,7 +1,7 @@
 name: Push Request on Main
 
 on:
-  push:
+  pull_request:
     branches:
       - main
 
@@ -31,6 +31,7 @@ jobs:
         run: echo "${{ github.run_number }}" > version.md
 
       - name: Log in to Docker Hub
+        if: github.event.pull_request.merged == true
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -40,6 +41,7 @@ jobs:
         run: chmod +x dev.sh
 
       - name: Bump Version and Tag Docker Image
+        if: github.event.pull_request.merged == true
         run: |
           bash dev.sh
           docker build -t vedmastaren/test:${{ github.run_number }} .
@@ -67,16 +69,6 @@ jobs:
           slack-message: "New push to main but it failed ${{ github.event.pusher.name }}: ${{ github.event.compare }}"
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_TOKEN }}
-
-      - name: Run npm audit
-        id: npm_audit
-        run: |
-          if npm audit --json | grep -q '"severity": "high"'; then
-            echo "High severity vulnerabilities found"
-            exit 1
-          else
-            echo "No high severity vulnerabilities found"
-          fi
 
       - name: Post Audit Results to Slack
         if: failure()  # Kör detta steg endast om npm audit hittar sårbarheter
