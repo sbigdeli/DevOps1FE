@@ -1,0 +1,42 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main  # adjust branch name as needed
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run npm audit
+        run: npm audit --audit-level=high
+
+      - name: Run Automated Tests
+        run: npm test
+
+      - name: Store Application Version
+        run: echo "${{ github.run_number }}" > version.txt
+
+      - name: Bump Version and Tag Docker Image
+        run: |
+          ./test.sh
+          docker build -t myapp:${{ github.run_number }} .
+          docker tag myapp:${{ github.run_number }} myapp:v${{ github.run_number }}
+          docker push myapp:${{ github.run_number }}
+          docker push myapp:v${{ github.run_number }}
+
+      - name: Tag Repository Commit
+        run: git tag v${{ github.run_number }}
