@@ -51,11 +51,13 @@ jobs:
 
 
     - name: Add tag to commit
+      env:
+        GH_PAT: ${{ secrets.GH_PAT }}
       run: |
         git config --global user.name 'github-actions'
         git config --global user.email 'github-actions@github.com'
         git tag -a v${{ env.VERSION }} -m "Release v${{ env.VERSION }}"
-        git push origin v${{ env.VERSION }}
+        git push https://github-actions:${GH_PAT}@github.com/Vedmastaren/DevOps1FE.git v${{ env.VERSION }}
 
     - name: Post Log in to Docker Hub
       run: echo "Docker Hub login step completed"
