@@ -39,21 +39,11 @@ jobs:
         docker push vedmastaren/test:${{ env.VERSION }}
         docker push vedmastaren/test:v${{ env.VERSION }}
 
-    #- name: Set Kubernetes context
-     # run: az aks get-credentials --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ secrets.AZURE_AKS_CLUSTER }}
-
-    #- name: Update Kubernetes manifest with image version
-    #  run: |
-    #    sed -i 's|image: vedmastaren/test:.*|image: vedmastaren/test:${{ env.VERSION }}|' k8s/deployment.yaml
-
-    #- name: Deploy K8s secrets
-    #  run: kubectl apply -f k8s/secrets.yaml
-
-
     - name: Add tag to commit
+      uses: actions/checkout@v4
       env:
         GH_PAT: ${{ secrets.GH_PAT }}
-      run: |
+    - run: |
         git config --global user.name 'github-actions'
         git config --global user.email 'github-actions@github.com'
         git tag -a v${{ env.VERSION }} -m "Release v${{ env.VERSION }}"
