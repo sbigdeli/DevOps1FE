@@ -1,6 +1,10 @@
 # OBS! Glöm inte köra filen: kubectl apply -f deployment.yaml
 # Denna fil innehåller både deployment- och service.yaml, går att separera med --- sträckk
-
+# Kör dessa kommando i ordning:
+# kubectl apply -f deployment.yaml
+# kubectl get pods -l app=frontend
+# kubectl get deployments
+# minikube service frontend
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -17,7 +21,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: vedmastaren/frontend:latest # Ändra till korrekt image, hur gör man när man uppdaterar version, fråga Jon? (nu heter den vedmastaren/test i docker hub)! Behöver göra en för varje, frontend, user, och todo...)
+        image: vedmastaren/frontend:v1.0.0 # Ändra till korrekt image, hur gör man när man uppdaterar version, fråga Jon? (nu heter den vedmastaren/test i docker hub)! Behöver göra en för varje, frontend, user, och todo...)
         ports:
         - containerPort: 80
 ---
