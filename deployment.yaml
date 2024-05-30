@@ -1,5 +1,5 @@
 # OBS! Glöm inte köra filen: kubectl apply -f deployment.yaml
-# Denna fil innehåller både deployment- och service.yaml, går att separera med --- sträck
+# Denna fil innehåller både deployment- och service.yaml, går att separera med --- sträckk
 
 apiVersion: apps/v1
 kind: Deployment
