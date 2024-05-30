@@ -1,5 +1,5 @@
 # OBS! Glöm inte köra filen: kubectl apply -f deployment.yaml
-# Denna fil innehåller både deployment- och service.yaml, går att separera med --- sträckk
+# Denna fil innehåller både deployment- och service.yaml, går att separera med --- sträckkk
 # Kör dessa kommando i ordning:
 # kubectl apply -f deployment.yaml
 # kubectl get pods -l app=frontend
