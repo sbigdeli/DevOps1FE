@@ -1,1 +1,33 @@
-# NEXT STEP
+# OBS! Glöm inte köra filen: kubectl apply -f deployment.yaml
+# Denna fil innehåller både deployment- och service.yaml, går att separera med --- sträck
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: vedmastaren/frontend:latest # Ändra till korrekt image, hur gör man när man uppdaterar version, fråga Jon? (nu heter den vedmastaren/test i docker hub)! Behöver göra en för varje, frontend, user, och todo...)
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: frontend

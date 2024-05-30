@@ -30,14 +30,14 @@ jobs:
       run: npm test
 
     - name: Build Docker image
-      run: docker build -t vedmastaren/test .
+      run: docker build -t vedmastaren/frontend . # Ändrat till vedmastaren/frontend
 
     - name: Read version from version.md
       id: version
       run: echo "VERSION=$(cat version.md)" >> $GITHUB_ENV
 
     - name: Tag Docker image with version
-      run: docker tag vedmastaren/test:latest vedmastaren/test:v${{ env.VERSION }}
+      run: docker tag vedmastaren/frontend:latest vedmastaren/frontend:v${{ env.VERSION }} # Ändrat till vedmastaren/frontend
 
     - name: Log in to Docker Hub
       uses: docker/login-action@v2
@@ -46,7 +46,7 @@ jobs:
         password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
     - name: Push Docker image to Docker Hub
-      run: docker push vedmastaren/test:v${{ env.VERSION }}
+      run: docker push vedmastaren/frontend:v${{ env.VERSION }} # Ändrat till vedmastaren/frontend
 
     - name: Add tag to commit
       run: |
