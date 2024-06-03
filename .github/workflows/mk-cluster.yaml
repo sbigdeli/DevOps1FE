@@ -20,10 +20,14 @@ jobs:
           # Start Minikube
           minikube start --driver=docker
 
+      - name: Checkout deployment.yaml from another repository
+        uses: actions/checkout@v2
+        with:
+          repository: enkas1/group-project-repo
+    
+
       - name: Deploy Kubernetes resources
-        run: |
-          # Apply deployment.yaml file from the kubernetes-configs folder
-          kubectl apply -f group-project-devops-repo/deployment.yaml
+        run: kubectl apply -f deployment.yaml
 
       - name: Verify deployment
         run: |
