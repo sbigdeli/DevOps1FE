@@ -28,6 +28,12 @@ jobs:
 
     - name: Run Automated Tests
       run: npm test
+      
+    - name: Install ESLint
+      run: npm install eslint --save-dev
+
+    - name: Run ESLint
+      run: npm run lint
 
     - name: Build Docker image
       run: docker build -t vedmastaren/frontend . # Ändrat till vedmastaren/frontend
