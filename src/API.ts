@@ -1,4 +1,4 @@
-const baseUrl: string = 'http://localhost:4000'
+const baseUrl = 'http://localhost:4000'
 
 const getHeaders = (): HeadersInit => {
     const token = localStorage.getItem('token') ?? "";
