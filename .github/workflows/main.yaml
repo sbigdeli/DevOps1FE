@@ -29,8 +29,8 @@ jobs:
     - name: Run Automated Tests
       run: npm test
       
-    - name: Install ESLint
-      run: npm install eslint --save-dev
+    - name: Install plugin
+      run: npm install --save-dev eslint-plugin-testing-library
 
     - name: Run ESLint
       run: npm run lint
